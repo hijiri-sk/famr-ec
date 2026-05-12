@@ -152,6 +152,24 @@
         <p>Transport / evacuation · 搬运・撤离</p>
       </button>
     </div>
+
+    <h3 style="margin:16px 0 8px;font-size:0.95rem;">練習モード</h3>
+    <div class="scenarios">
+      <button class="scen" data-mode="random">
+        <h3>🎲 ランダム1問</h3>
+        <p>全シナリオから1問ずつ。連続練習向け。</p>
+      </button>
+      <button class="scen" data-mode="review">
+        <h3>🔁 間違えた所だけ復習</h3>
+        <p id="reviewCount">残り 0 問</p>
+      </button>
+    </div>
+
+    <div style="text-align:right;margin-top:12px;">
+      <button id="resetHistoryBtn" class="ghost" style="font-size:0.8rem;color:var(--sub);">
+        🗑 練習履歴をリセット
+      </button>
+    </div>
   </section>
 
   <!-- 練習画面 -->
@@ -460,7 +478,8 @@ const scripts = {
    ========================================================= */
 let lang = "en";        // "en" | "zh"
 let showTr = false;     // ランナーの和訳を表示するか
-let scenario = null;    // "sprain" | "bleeding" | "hypothermia" | "heat"
+let scenario = null;    // "sprain" | "bleeding" | "hypothermia" | "heat" | "transport" | "random" | "review"
+let practiceMode = null; // null | "random" | "review"
 let turns = [];         // 結合済みターン配列
 let idx = 0;
 let recognition = null;
@@ -479,7 +498,14 @@ const $ = (id) => document.getElementById(id);
 function setLang(next) {
   lang = next;
   $("langLabel").textContent = lang === "en" ? "English" : "中文 (zh-CN)";
-  if (scenario) startScenario(scenario, idx); // 再構築（位置を保持）
+  updateReviewCount();
+  if (practiceMode === "random") {
+    loadNextRandom();
+  } else if (practiceMode === "review") {
+    loadNextReview();
+  } else if (scenario) {
+    startScenario(scenario, idx); // 再構築（位置を保持）
+  }
 }
 $("langBtn").addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));
 
@@ -495,21 +521,183 @@ $("trBtn").addEventListener("click", () => {
    シナリオ選択
    ========================================================= */
 document.querySelectorAll(".scen").forEach(btn => {
-  btn.addEventListener("click", () => startScenario(btn.dataset.scen, 0));
+  btn.addEventListener("click", () => {
+    if (btn.dataset.scen) startScenario(btn.dataset.scen, 0);
+    else if (btn.dataset.mode === "random") startRandom();
+    else if (btn.dataset.mode === "review") startReview();
+  });
 });
+
+/* =========================================================
+   練習モード（ランダム1問 / 間違えた所だけ復習）
+   ========================================================= */
+const MISSED_KEY = "famr-ec.missed.v1";
+
+function loadMissed() {
+  try { return JSON.parse(localStorage.getItem(MISSED_KEY)) || {}; }
+  catch (e) { return {}; }
+}
+function saveMissed(obj) {
+  try { localStorage.setItem(MISSED_KEY, JSON.stringify(obj)); } catch (e) {}
+}
+function markScoreOnTurn(cur, percent) {
+  if (!cur || cur.speaker !== "user" || !cur._scen) return;
+  const m = loadMissed();
+  const key = `${cur._scen}:${cur._idx}:${lang}`;
+  if (percent >= 80) {
+    if (m[key]) { delete m[key]; saveMissed(m); }
+  } else if (percent < 55) {
+    m[key] = { lastScore: percent, ts: Date.now() };
+    saveMissed(m);
+  }
+  updateReviewCount();
+}
+function updateReviewCount() {
+  const el = $("reviewCount");
+  if (!el) return;
+  const m = loadMissed();
+  const n = Object.keys(m).filter(k => k.endsWith(":" + lang)).length;
+  el.textContent = `残り ${n} 問（${lang === "en" ? "EN" : "中文"}）`;
+}
+
+function getSource(scenName) {
+  return scenName === "intro" ? intro[lang] : scripts[scenName][lang];
+}
+function buildSingleProblem(scenName, internalIdx) {
+  const source = getSource(scenName);
+  if (!source || !source[internalIdx]) {
+    // データが見つからない（言語切替後など）→ スキップ
+    if (practiceMode === "review") return loadNextReview();
+    if (practiceMode === "random") return loadNextRandom();
+    return;
+  }
+  const userTurn = { ...source[internalIdx], _scen: scenName, _idx: internalIdx };
+  const ctx = internalIdx > 0
+    ? { ...source[internalIdx - 1], _scen: scenName, _idx: internalIdx - 1 }
+    : null;
+  turns = ctx ? [ctx, userTurn] : [userTurn];
+  idx = turns.length - 1;
+  $("picker").classList.add("hidden");
+  $("practice").classList.remove("hidden");
+  render();
+  // コンテキストがランナー発話なら自動再生
+  if (ctx && ctx.speaker === "runner") {
+    setTimeout(() => speak(ctx.text, lang), 200);
+  }
+}
+
+function collectAllUserTurns() {
+  const list = [];
+  intro[lang].forEach((t, i) => {
+    if (t.speaker === "user") list.push({ scen: "intro", idx: i });
+  });
+  for (const [name, def] of Object.entries(scripts)) {
+    def[lang].forEach((t, i) => {
+      if (t.speaker === "user") list.push({ scen: name, idx: i });
+    });
+  }
+  return list;
+}
+
+function startRandom() {
+  practiceMode = "random";
+  scenario = "random";
+  loadNextRandom();
+}
+function loadNextRandom() {
+  const all = collectAllUserTurns();
+  if (!all.length) return;
+  const pick = all[Math.floor(Math.random() * all.length)];
+  buildSingleProblem(pick.scen, pick.idx);
+}
+
+function refreshReviewQueue() {
+  const m = loadMissed();
+  return Object.keys(m)
+    .filter(k => k.endsWith(":" + lang))
+    .map(k => {
+      const parts = k.split(":");
+      return { scen: parts[0], idx: parseInt(parts[1], 10) };
+    });
+}
+function startReview() {
+  const q = refreshReviewQueue();
+  if (!q.length) {
+    alert("復習する問題がまだありません。\nシナリオ練習や「ランダム1問」で 55% 未満を取った問題が、ここに溜まっていきます。");
+    return;
+  }
+  practiceMode = "review";
+  scenario = "review";
+  loadNextReview();
+}
+function loadNextReview() {
+  const q = refreshReviewQueue();
+  if (!q.length) {
+    // 全マスター → 完了画面
+    $("picker").classList.add("hidden");
+    $("practice").classList.remove("hidden");
+    $("convo").innerHTML = `<div class="card" style="margin:0;text-align:center;">
+      🎉 すべての復習を完了しました！</div>`;
+    $("targetText").textContent = "";
+    $("targetTr").style.display = "none";
+    $("heard").textContent = "";
+    $("diff").innerHTML = "";
+    $("scoreBadge").textContent = "—";
+    $("scoreBadge").className = "score";
+    $("nextBtn").disabled = true;
+    $("micBtn").disabled = true;
+    $("playTarget").disabled = true;
+    $("status").textContent = "「シナリオ選択へ戻る」で別の練習へ。";
+    return;
+  }
+  const pick = q[Math.floor(Math.random() * q.length)];
+  buildSingleProblem(pick.scen, pick.idx);
+}
+
+/* 履歴リセット */
+$("resetHistoryBtn").addEventListener("click", () => {
+  const m = loadMissed();
+  const total = Object.keys(m).length;
+  const nEn = Object.keys(m).filter(k => k.endsWith(":en")).length;
+  const nZh = Object.keys(m).filter(k => k.endsWith(":zh")).length;
+  if (total === 0) {
+    alert("リセットする履歴はありません。");
+    return;
+  }
+  const ok = confirm(
+    `練習履歴を全て削除します。よろしいですか？\n\n` +
+    `・英語 (EN)：${nEn} 問\n` +
+    `・中国語 (ZH)：${nZh} 問\n` +
+    `合計：${total} 件\n\n` +
+    `この操作は元に戻せません。`
+  );
+  if (!ok) return;
+  try { localStorage.removeItem(MISSED_KEY); } catch (e) {}
+  updateReviewCount();
+  alert(`${total} 件の履歴を削除しました。`);
+});
+
+/* 起動時に復習件数を更新 */
+updateReviewCount();
 $("restartBtn").addEventListener("click", () => {
   $("practice").classList.add("hidden");
   $("picker").classList.remove("hidden");
   scenario = null;
+  practiceMode = null;
   window.speechSynthesis && window.speechSynthesis.cancel();
   stopRec();
+  updateReviewCount();
 });
 
 function startScenario(name, startIdx) {
   scenario = name;
+  practiceMode = null;
   const scen = scripts[name];
-  const introTurns = scen.skipIntro ? [] : intro[lang];
-  turns = [...introTurns, ...scen[lang]];
+  const introTurns = scen.skipIntro
+    ? []
+    : intro[lang].map((t, i) => ({ ...t, _scen: "intro", _idx: i }));
+  const scenTurns = scen[lang].map((t, i) => ({ ...t, _scen: name, _idx: i }));
+  turns = [...introTurns, ...scenTurns];
   idx = Math.min(startIdx, turns.length - 1);
   $("picker").classList.add("hidden");
   $("practice").classList.remove("hidden");
@@ -521,6 +709,18 @@ function startScenario(name, startIdx) {
    ========================================================= */
 function render() {
   resetRecording();
+  // 練習モードに応じてボタン表示を調整
+  if (practiceMode === "random") {
+    $("nextBtn").textContent = "🎲 別の問題 →";
+    $("skipBtn").style.display = "none";
+  } else if (practiceMode === "review") {
+    const remaining = refreshReviewQueue().length;
+    $("nextBtn").textContent = `→ 次の復習（残り ${remaining}）`;
+    $("skipBtn").style.display = "none";
+  } else {
+    $("nextBtn").textContent = "次へ →";
+    $("skipBtn").style.display = "";
+  }
   const convo = $("convo");
   convo.innerHTML = "";
 
@@ -608,8 +808,16 @@ function escapeHTML(s) {
   }[c]));
 }
 
-$("nextBtn").addEventListener("click", () => { idx++; render(); });
-$("skipBtn").addEventListener("click", () => { idx++; render(); });
+$("nextBtn").addEventListener("click", () => {
+  if (practiceMode === "random") return loadNextRandom();
+  if (practiceMode === "review") return loadNextReview();
+  idx++; render();
+});
+$("skipBtn").addEventListener("click", () => {
+  if (practiceMode === "random") return loadNextRandom();
+  if (practiceMode === "review") return loadNextReview();
+  idx++; render();
+});
 
 /* =========================================================
    TTS（お手本）
@@ -736,9 +944,12 @@ function handleTranscript(transcript) {
   $("diff").innerHTML = result.diffHTML;
   $("nextBtn").disabled = result.percent < 55; // ある程度言えたら次へ進める
   $("status").textContent =
-    result.percent >= 80 ? "👍 とても良いです！「次へ」で進みましょう。" :
+    result.percent >= 80 ? "👍 とても良いです！" + (practiceMode === "review" ? "復習リストから削除します。" : "「次へ」で進みましょう。") :
     result.percent >= 55 ? "もう少しで完璧。もう一度言ってみても、進んでもOKです。" :
                            "発音が認識されにくかったようです。もう一度試してみましょう。";
+
+  // 間違い／マスター記録（練習モード問わず）
+  markScoreOnTurn(cur, result.percent);
 }
 
 /* 採点：英語は単語単位、中国語は文字単位（句読点除去） */
