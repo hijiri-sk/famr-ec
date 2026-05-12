@@ -147,6 +147,10 @@
         <h3>④ 脱水・熱中症</h3>
         <p>Dehydration / Heat illness · 脱水・中暑</p>
       </button>
+      <button class="scen" data-scen="transport">
+        <h3>⑤ 搬送時の声かけ</h3>
+        <p>Transport / evacuation · 搬运・撤离</p>
+      </button>
     </div>
   </section>
 
@@ -392,6 +396,63 @@ const scripts = {
         ja: "少しずつ飲み続けてください。15分以内に良くならなければ、救助を呼びます。" },
     ],
   },
+
+  transport: {
+    title_ja: "搬送時の声かけ",
+    skipIntro: true,
+    en: [
+      { speaker: "user", text: "Can you walk by yourself, or do you need to be carried?",
+        ja: "自分で歩けますか？それとも運んでもらう必要がありますか？" },
+      { speaker: "runner", text: "I can't walk. The pain is too bad.",
+        ja: "歩けません。痛みが強すぎます。" },
+      { speaker: "user", text: "OK. We will prepare to carry you out now. It will take some time — can you hang in there?",
+        ja: "今から搬送の準備をします。少し時間がかかりますが、がんばれますか？" },
+      { speaker: "runner", text: "Yes, I'll try. Thank you.",
+        ja: "はい、頑張ります。ありがとうございます。" },
+      { speaker: "user", text: "This is a trail, so vehicles can't come here. We'll carry you to a spot where a car can reach. It will take a while.",
+        ja: "ここはトレイルなので車は入れません。車が入れる場所まであなたを運びます。少し時間がかかります。" },
+      { speaker: "runner", text: "I understand. Thank you for helping me.",
+        ja: "わかりました。助けていただいてありがとうございます。" },
+      { speaker: "user", text: "One of our staff will carry you on his back. The rest of us will support him. Please tell us right away if you feel any pain or discomfort.",
+        ja: "スタッフがあなたを背負います。私たちもフォローしますが、痛みや違和感があればすぐ教えてください。" },
+      { speaker: "runner", text: "OK, I will.",
+        ja: "わかりました。" },
+      { speaker: "user", text: "Are you settled okay? Is anything uncomfortable?",
+        ja: "（背負い終わって）大丈夫ですか？不愉快なところはないですか？" },
+      { speaker: "runner", text: "I'm fine. Thank you.",
+        ja: "大丈夫です。ありがとうございます。" },
+      { speaker: "user", text: "How are you doing? We're almost there — about fifteen more minutes.",
+        ja: "（移動中）大丈夫ですか？もう少しです。15分ほどで着くでしょう。" },
+      { speaker: "runner", text: "OK. Thank you so much.",
+        ja: "わかりました。本当にありがとうございます。" },
+    ],
+    zh: [
+      { speaker: "user", text: "你能自己走吗？还是需要我们抬你？",
+        ja: "自分で歩けますか？それとも運んでもらう必要がありますか？" },
+      { speaker: "runner", text: "我走不了，太疼了。",
+        ja: "歩けません。痛みが強すぎます。" },
+      { speaker: "user", text: "好的，我们现在准备搬运你。会需要一些时间，你能撑住吗？",
+        ja: "今から搬送の準備をします。少し時間がかかりますが、がんばれますか？" },
+      { speaker: "runner", text: "嗯，我尽量。谢谢。",
+        ja: "はい、頑張ります。ありがとうございます。" },
+      { speaker: "user", text: "这里是登山道，车进不来。我们会把你抬到车能到的地方。这会花一些时间。",
+        ja: "ここはトレイルなので車は入れません。車が入れる場所まであなたを運びます。少し時間がかかります。" },
+      { speaker: "runner", text: "我明白。谢谢你们帮我。",
+        ja: "わかりました。助けていただいてありがとうございます。" },
+      { speaker: "user", text: "我们一位队员会背你。其他人会跟着支援。如果感到疼痛或不舒服，请马上告诉我们。",
+        ja: "スタッフがあなたを背負います。私たちもフォローしますが、痛みや違和感があればすぐ教えてください。" },
+      { speaker: "runner", text: "好，我会的。",
+        ja: "わかりました。" },
+      { speaker: "user", text: "现在还好吗？有不舒服的地方吗？",
+        ja: "（背負い終わって）大丈夫ですか？不愉快なところはないですか？" },
+      { speaker: "runner", text: "还好。谢谢。",
+        ja: "大丈夫です。ありがとうございます。" },
+      { speaker: "user", text: "你还好吗？快到了——再大概十五分钟就到。",
+        ja: "（移動中）大丈夫ですか？もう少しです。15分ほどで着くでしょう。" },
+      { speaker: "runner", text: "好，真的非常感谢。",
+        ja: "わかりました。本当にありがとうございます。" },
+    ],
+  },
 };
 
 /* =========================================================
@@ -446,7 +507,9 @@ $("restartBtn").addEventListener("click", () => {
 
 function startScenario(name, startIdx) {
   scenario = name;
-  turns = [...intro[lang], ...scripts[name][lang]];
+  const scen = scripts[name];
+  const introTurns = scen.skipIntro ? [] : intro[lang];
+  turns = [...introTurns, ...scen[lang]];
   idx = Math.min(startIdx, turns.length - 1);
   $("picker").classList.add("hidden");
   $("practice").classList.remove("hidden");
