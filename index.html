@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>野外ファーストエイド 会話練習 / Wilderness First Aid Practice</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --ink: #1f2937;
+    --sub: #6b7280;
+    --line: #e5e7eb;
+    --user: #2563eb;
+    --runner: #b45309;
+    --good: #16a34a;
+    --warn: #d97706;
+    --bad: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans",
+      "Yu Gothic UI", Meiryo, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; padding: 8px 4px 16px;
+  }
+  h1 { font-size: 1.1rem; margin: 0; }
+  .sub { color: var(--sub); font-size: 0.85rem; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit; border: 1px solid var(--line); background: #fff; color: var(--ink);
+    border-radius: 8px; padding: 8px 12px; cursor: pointer;
+  }
+  button:hover { background: #f9fafb; }
+  button.primary { background: var(--user); color: #fff; border-color: var(--user); }
+  button.primary:hover { background: #1d4ed8; }
+  button.ghost { background: transparent; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px; font-size: 0.8rem;
+    border: 1px solid var(--line); background: #fff;
+  }
+  .pill.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px; margin-bottom: 14px;
+  }
+  .scenarios { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 10px; }
+  .scen {
+    text-align: left; padding: 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: #fff; cursor: pointer;
+  }
+  .scen:hover { border-color: var(--user); }
+  .scen h3 { margin: 0 0 4px; font-size: 1rem; }
+  .scen p { margin: 0; color: var(--sub); font-size: 0.85rem; }
+
+  .turn { margin-bottom: 10px; display: flex; gap: 10px; }
+  .turn .bubble {
+    border-radius: 12px; padding: 10px 12px; max-width: 80%;
+    border: 1px solid var(--line); background: #fff;
+  }
+  .turn.runner { justify-content: flex-start; }
+  .turn.runner .bubble { background: #fff7ed; border-color: #fed7aa; }
+  .turn.user { justify-content: flex-end; }
+  .turn.user .bubble { background: #eff6ff; border-color: #bfdbfe; }
+  .tr {
+    color: var(--sub); font-size: 0.85rem; margin-top: 6px;
+    border-top: 1px dashed var(--line); padding-top: 4px;
+  }
+  .who { font-size: 0.75rem; color: var(--sub); margin-bottom: 2px; }
+  .target { font-size: 1.05rem; }
+  .heard { font-size: 0.9rem; color: var(--sub); margin-top: 4px; min-height: 1.2em; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .score {
+    font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    background: #f3f4f6; color: var(--sub); font-size: 0.85rem;
+  }
+  .score.good { background: #dcfce7; color: var(--good); }
+  .score.mid  { background: #fef3c7; color: var(--warn); }
+  .score.bad  { background: #fee2e2; color: var(--bad);  }
+
+  .mic {
+    width: 64px; height: 64px; border-radius: 50%; border: none;
+    background: var(--user); color: #fff; font-size: 1.6rem; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  }
+  .mic.rec { background: var(--bad); animation: pulse 1s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.6); }
+    70% { box-shadow: 0 0 0 14px rgba(220,38,38,0); }
+    100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+  }
+  .controls {
+    display: flex; gap: 10px; align-items: center; justify-content: center;
+    flex-wrap: wrap; padding: 8px 0 4px;
+  }
+  .note { color: var(--sub); font-size: 0.8rem; }
+  .diff .ok  { color: var(--good); }
+  .diff .miss { color: var(--bad); text-decoration: underline wavy var(--bad); }
+  footer { color: var(--sub); font-size: 0.8rem; text-align: center; padding: 18px 0; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>野外ファーストエイド 会話練習</h1>
+      <div class="sub">Wilderness First Aid · レスキュースタッフ（あなた）↔ ケガをしたランナー</div>
+    </div>
+    <div class="toolbar">
+      <button id="langBtn" class="pill active" title="言語切替">EN ↔ 中文</button>
+      <span id="langLabel" class="pill">English</span>
+      <button id="trBtn" class="pill" title="ランナーの和訳表示">訳 OFF</button>
+    </div>
+  </header>
+
+  <!-- シナリオ選択 -->
+  <section id="picker" class="card">
+    <h2 style="margin:0 0 8px;font-size:1rem;">シナリオを選んでください</h2>
+    <p class="note" style="margin:0 0 12px;">あなたはレスキュースタッフ。ケガをしたランナーに対応します。マイクで発音 → 認識結果で採点します。</p>
+    <div class="scenarios">
+      <button class="scen" data-scen="sprain">
+        <h3>① 足首の捻挫</h3>
+        <p>Ankle sprain · 扭到脚踝</p>
+      </button>
+      <button class="scen" data-scen="bleeding">
+        <h3>② 出血</h3>
+        <p>Bleeding wound · 流血</p>
+      </button>
+      <button class="scen" data-scen="hypothermia">
+        <h3>③ 低体温</h3>
+        <p>Hypothermia · 失温</p>
+      </button>
+      <button class="scen" data-scen="heat">
+        <h3>④ 脱水・熱中症</h3>
+        <p>Dehydration / Heat illness · 脱水・中暑</p>
+      </button>
+    </div>
+  </section>
+
+  <!-- 練習画面 -->
+  <section id="practice" class="hidden">
+    <div class="card" id="convo"></div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div class="who">あなたのセリフ（レスキュースタッフ）</div>
+          <div id="targetText" class="target"></div>
+          <div id="heard" class="heard"></div>
+          <div id="diff" class="diff note" style="margin-top:4px;"></div>
+        </div>
+        <div style="text-align:right;">
+          <div id="scoreBadge" class="score">— %</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="playTarget" title="お手本（合成音声）を聞く">🔊 お手本</button>
+        <button id="micBtn" class="mic" title="マイクで話す">🎤</button>
+        <button id="playMine" title="自分の録音を聞く" disabled>▶ あなたの声</button>
+        <button id="nextBtn" class="primary" disabled>次へ →</button>
+      </div>
+      <p class="note" id="status" style="text-align:center;margin:6px 0 0;">マイクを押して話してください</p>
+    </div>
+
+    <div class="row" style="justify-content:space-between;">
+      <button id="restartBtn" class="ghost">↩ シナリオ選択へ戻る</button>
+      <button id="skipBtn" class="ghost">スキップ →</button>
+    </div>
+  </section>
+
+  <footer>
+    Chrome / Edge 推奨 · マイク使用許可が必要です · すべてローカル動作（認識はブラウザの音声API）
+  </footer>
+
+</div>
+
+<script>
+/* =========================================================
+   スクリプト（EN / zh-CN）
+   ========================================================= */
+const intro = {
+  en: [
+    { speaker: "runner", text: "Help! I'm hurt!", ja: "助けて！怪我をしました！" },
+    { speaker: "user",   text: "Are you okay? I'm with the rescue staff. What happened?" },
+  ],
+  zh: [
+    { speaker: "runner", text: "救命！我受伤了！", ja: "助けて！怪我をしました！" },
+    { speaker: "user",   text: "你还好吗？我是救援人员。发生了什么事？" },
+  ],
+};
+
+const scripts = {
+  sprain: {
+    title_ja: "足首の捻挫",
+    en: [
+      { speaker: "runner", text: "I twisted my ankle on a rock. It really hurts.",
+        ja: "石で足首をひねりました。とても痛いです。" },
+      { speaker: "user",   text: "Please sit down. Can you show me where it hurts?" },
+      { speaker: "runner", text: "Right here, on the outside of my ankle.",
+        ja: "ここ、足首の外側です。" },
+      { speaker: "user",   text: "Is it swollen? Can you move your foot a little?" },
+      { speaker: "runner", text: "It's swelling. Moving it hurts a lot.",
+        ja: "腫れています。動かすとすごく痛いです。" },
+      { speaker: "user",   text: "Before I treat it — did you eat and drink at the last aid station?" },
+      { speaker: "runner", text: "I had a gel and some water there, about an hour ago.",
+        ja: "1時間ほど前、エイドでジェルを食べて水も飲みました。" },
+      { speaker: "user",   text: "Good. I will put a cold pack on it and wrap a bandage." },
+      { speaker: "runner", text: "Thank you. Can I walk down the trail?",
+        ja: "ありがとう。自分で下山できますか？" },
+      { speaker: "user",   text: "Please don't put weight on it. I will call for help to carry you out." },
+    ],
+    zh: [
+      { speaker: "runner", text: "我在石头上扭到脚踝了，很疼。",
+        ja: "石で足首をひねりました。とても痛いです。" },
+      { speaker: "user",   text: "请坐下来。可以告诉我哪里疼吗？" },
+      { speaker: "runner", text: "就在这里，脚踝的外侧。",
+        ja: "ここ、足首の外側です。" },
+      { speaker: "user",   text: "肿起来了吗？可以稍微动一下脚吗？" },
+      { speaker: "runner", text: "肿了，一动就很疼。",
+        ja: "腫れています。動かすとすごく痛いです。" },
+      { speaker: "user",   text: "处理之前问一下——你在上一个补给站有吃东西、喝水吗？" },
+      { speaker: "runner", text: "大概一个小时前，在补给站吃了能量胶，也喝了水。",
+        ja: "1時間ほど前、エイドでジェルを食べて水も飲みました。" },
+      { speaker: "user",   text: "好。我给你敷冰袋，然后用绷带固定。" },
+      { speaker: "runner", text: "谢谢。我还能自己走下山吗？",
+        ja: "ありがとう。自分で下山できますか？" },
+      { speaker: "user",   text: "请不要用力踩。我叫人来把你抬下去。" },
+    ],
+  },
+
+  bleeding: {
+    title_ja: "出血",
+    en: [
+      { speaker: "runner", text: "I fell on a sharp rock. My leg is bleeding.",
+        ja: "尖った石の上に転んで、脚から血が出ています。" },
+      { speaker: "user",   text: "Let me see the wound. I will press on it to stop the bleeding." },
+      { speaker: "runner", text: "It really hurts. Is the cut deep?",
+        ja: "とても痛いです。傷は深いですか？" },
+      { speaker: "user",   text: "Please keep pressing here while I get a bandage." },
+      { speaker: "runner", text: "Okay. I feel a little dizzy.",
+        ja: "わかりました。少しめまいがします。" },
+      { speaker: "user",   text: "Have you been drinking water today? When did you last eat?" },
+      { speaker: "runner", text: "Not much water. I ate at the aid station about an hour ago.",
+        ja: "水はあまり飲んでいません。1時間ほど前にエイドで食べました。" },
+      { speaker: "user",   text: "Lie down and raise your leg. Drink some water slowly." },
+      { speaker: "runner", text: "Thank you. Will I be alright?",
+        ja: "ありがとう。大丈夫でしょうか？" },
+      { speaker: "user",   text: "Stay calm. I am calling for an evacuation right now." },
+    ],
+    zh: [
+      { speaker: "runner", text: "我摔在尖石头上，腿在流血。",
+        ja: "尖った石の上に転んで、脚から血が出ています。" },
+      { speaker: "user",   text: "让我看一下伤口。我用手按住止血。" },
+      { speaker: "runner", text: "好疼，伤口很深吗？",
+        ja: "とても痛いです。傷は深いですか？" },
+      { speaker: "user",   text: "请你按住这里，我去拿绷带。" },
+      { speaker: "runner", text: "好。我有点头晕。",
+        ja: "わかりました。少しめまいがします。" },
+      { speaker: "user",   text: "你今天有喝水吗？最后一次吃东西是什么时候？" },
+      { speaker: "runner", text: "水喝得不多。大概一个小时前在补给站吃过东西。",
+        ja: "水はあまり飲んでいません。1時間ほど前にエイドで食べました。" },
+      { speaker: "user",   text: "请躺下来，把腿抬高，慢慢喝点水。" },
+      { speaker: "runner", text: "谢谢。我会没事吧？",
+        ja: "ありがとう。大丈夫でしょうか？" },
+      { speaker: "user",   text: "保持冷静。我现在就联系救援。" },
+    ],
+  },
+
+  hypothermia: {
+    title_ja: "低体温",
+    en: [
+      { speaker: "runner", text: "I'm freezing. I can't stop shaking.",
+        ja: "寒くて震えが止まりません。" },
+      { speaker: "user",   text: "Let's move you out of the wind. Can you walk a few steps?" },
+      { speaker: "runner", text: "I'll try. I'm so cold.",
+        ja: "やってみます。すごく寒いです。" },
+      { speaker: "user",   text: "Are your clothes wet? We need to change into dry layers." },
+      { speaker: "runner", text: "Yes, my jacket is soaked.",
+        ja: "はい、ジャケットがびしょ濡れです。" },
+      { speaker: "user",   text: "Put on this dry jacket. I'll wrap you in a blanket." },
+      { speaker: "runner", text: "Thank you. I feel a little better.",
+        ja: "ありがとう。少しよくなりました。" },
+      { speaker: "user",   text: "When did you last eat? Calories will help your body warm up." },
+      { speaker: "runner", text: "Not since the last aid station, about two hours ago.",
+        ja: "前のエイドから食べていません。2時間ほど前です。" },
+      { speaker: "user",   text: "Please eat this energy bar slowly and drink this warm water. We are calling for rescue." },
+    ],
+    zh: [
+      { speaker: "runner", text: "我冷得发抖，停不下来。",
+        ja: "寒くて震えが止まりません。" },
+      { speaker: "user",   text: "我们离开风口。可以走几步吗？" },
+      { speaker: "runner", text: "我试试看。好冷。",
+        ja: "やってみます。すごく寒いです。" },
+      { speaker: "user",   text: "你的衣服湿了吗？我们需要换上干衣服。" },
+      { speaker: "runner", text: "嗯，外套全湿了。",
+        ja: "はい、ジャケットがびしょ濡れです。" },
+      { speaker: "user",   text: "请穿上这件干外套。我用毯子把你裹起来。" },
+      { speaker: "runner", text: "谢谢，好一点了。",
+        ja: "ありがとう。少しよくなりました。" },
+      { speaker: "user",   text: "你最后一次吃东西是什么时候？补充热量能帮助身体回暖。" },
+      { speaker: "runner", text: "上一个补给站之后就没吃了，大概两个小时前。",
+        ja: "前のエイドから食べていません。2時間ほど前です。" },
+      { speaker: "user",   text: "请慢慢吃这块能量棒，再喝这杯温水。我们正在联系救援。" },
+    ],
+  },
+
+  heat: {
+    title_ja: "脱水・熱中症",
+    en: [
+      { speaker: "runner", text: "I feel really dizzy. I think I'm going to pass out.",
+        ja: "ひどくめまいがします。倒れそうです。" },
+      { speaker: "user",   text: "Let's get you into the shade. Please sit down here." },
+      { speaker: "runner", text: "Everything is spinning. My head is pounding.",
+        ja: "目が回ります。頭がガンガンします。" },
+      { speaker: "user",   text: "When did you last drink water? Did you eat at the last aid station?" },
+      { speaker: "runner", text: "I drank a little about thirty minutes ago. I didn't eat — I felt nauseous.",
+        ja: "30分ほど前に少し飲みました。吐き気がして食べていません。" },
+      { speaker: "user",   text: "You may be dehydrated. Please sip this sports drink slowly." },
+      { speaker: "runner", text: "My skin feels hot, but I'm not sweating much anymore.",
+        ja: "肌が熱いですが、もうあまり汗が出ません。" },
+      { speaker: "user",   text: "That is a warning sign. I will pour cool water on your neck and arms." },
+      { speaker: "runner", text: "Thank you. I feel a little better now.",
+        ja: "ありがとう。今は少しよくなりました。" },
+      { speaker: "user",   text: "Keep taking small sips. If you don't improve in fifteen minutes, we will call for evacuation." },
+    ],
+    zh: [
+      { speaker: "runner", text: "我头好晕，好像快要昏倒了。",
+        ja: "ひどくめまいがします。倒れそうです。" },
+      { speaker: "user",   text: "我们到阴凉的地方去。请在这里坐下。" },
+      { speaker: "runner", text: "天旋地转，头很痛。",
+        ja: "目が回ります。頭がガンガンします。" },
+      { speaker: "user",   text: "你最后一次喝水是什么时候？在上一个补给站有吃东西吗？" },
+      { speaker: "runner", text: "大概三十分钟前喝了一点。没吃东西，有点想吐。",
+        ja: "30分ほど前に少し飲みました。吐き気がして食べていません。" },
+      { speaker: "user",   text: "你可能脱水了。请慢慢喝这瓶运动饮料。" },
+      { speaker: "runner", text: "皮肤很烫，但已经不太出汗了。",
+        ja: "肌が熱いですが、もうあまり汗が出ません。" },
+      { speaker: "user",   text: "这是危险信号。我用凉水帮你浇脖子和手臂。" },
+      { speaker: "runner", text: "谢谢，现在好一点了。",
+        ja: "ありがとう。今は少しよくなりました。" },
+      { speaker: "user",   text: "请继续小口喝水。十五分钟内没有好转，我们就联系救援。" },
+    ],
+  },
+};
+
+/* =========================================================
+   状態
+   ========================================================= */
+let lang = "en";        // "en" | "zh"
+let showTr = false;     // ランナーの和訳を表示するか
+let scenario = null;    // "sprain" | "bleeding" | "hypothermia" | "heat"
+let turns = [];         // 結合済みターン配列
+let idx = 0;
+let recognition = null;
+let recognizing = false;
+// 自分の声の録音（聞き比べ用）
+let mediaStream = null;
+let mediaRecorder = null;
+let mediaChunks = [];
+let recordedUrl = null;
+
+const $ = (id) => document.getElementById(id);
+
+/* =========================================================
+   言語切替
+   ========================================================= */
+function setLang(next) {
+  lang = next;
+  $("langLabel").textContent = lang === "en" ? "English" : "中文 (zh-CN)";
+  if (scenario) startScenario(scenario, idx); // 再構築（位置を保持）
+}
+$("langBtn").addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));
+
+/* 和訳トグル */
+$("trBtn").addEventListener("click", () => {
+  showTr = !showTr;
+  $("trBtn").textContent = "訳 " + (showTr ? "ON" : "OFF");
+  $("trBtn").classList.toggle("active", showTr);
+  if (scenario) render();
+});
+
+/* =========================================================
+   シナリオ選択
+   ========================================================= */
+document.querySelectorAll(".scen").forEach(btn => {
+  btn.addEventListener("click", () => startScenario(btn.dataset.scen, 0));
+});
+$("restartBtn").addEventListener("click", () => {
+  $("practice").classList.add("hidden");
+  $("picker").classList.remove("hidden");
+  scenario = null;
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  stopRec();
+});
+
+function startScenario(name, startIdx) {
+  scenario = name;
+  turns = [...intro[lang], ...scripts[name][lang]];
+  idx = Math.min(startIdx, turns.length - 1);
+  $("picker").classList.add("hidden");
+  $("practice").classList.remove("hidden");
+  render();
+}
+
+/* =========================================================
+   描画
+   ========================================================= */
+function render() {
+  resetRecording();
+  const convo = $("convo");
+  convo.innerHTML = "";
+
+  // 既出ターンの履歴表示（現在のターンより前のみ）
+  for (let i = 0; i < idx; i++) {
+    convo.appendChild(renderBubble(turns[i]));
+  }
+
+  if (idx >= turns.length) {
+    convo.innerHTML += `<div class="card" style="margin:0;text-align:center;">
+      ✅ シナリオ完了！お疲れさまでした。</div>`;
+    $("targetText").textContent = "";
+    $("heard").textContent = "";
+    $("diff").innerHTML = "";
+    $("scoreBadge").textContent = "—";
+    $("scoreBadge").className = "score";
+    $("nextBtn").disabled = true;
+    $("micBtn").disabled = true;
+    $("playTarget").disabled = true;
+    $("status").textContent = "「シナリオ選択へ戻る」で別のシナリオを練習できます。";
+    return;
+  }
+
+  const cur = turns[idx];
+
+  if (cur.speaker === "runner") {
+    // ランナーのセリフはこちらで読み上げ、Nextボタンで進む
+    convo.appendChild(renderBubble(cur));
+
+    $("targetText").textContent = "（ランナーの発話を聞いてください）";
+    $("heard").textContent = "";
+    $("diff").innerHTML = "";
+    $("scoreBadge").textContent = "—";
+    $("scoreBadge").className = "score";
+    $("nextBtn").disabled = false;
+    $("micBtn").disabled = true;
+    $("playTarget").disabled = false;
+    $("playTarget").textContent = "🔊 もう一度聞く";
+    $("status").textContent = "「お手本」で聞き直し、準備ができたら「次へ」。";
+
+    // 自動再生
+    speak(cur.text, lang);
+  } else {
+    // 自分のターン
+    $("targetText").textContent = cur.text;
+    $("heard").textContent = "";
+    $("diff").innerHTML = "";
+    $("scoreBadge").textContent = "— %";
+    $("scoreBadge").className = "score";
+    $("nextBtn").disabled = true;
+    $("micBtn").disabled = false;
+    $("playTarget").disabled = false;
+    $("playTarget").textContent = "🔊 お手本";
+    $("status").textContent = "マイクを押して話してください";
+  }
+}
+
+/* 吹き出し1つを生成（runner は和訳を任意表示） */
+function renderBubble(t) {
+  const div = document.createElement("div");
+  div.className = "turn " + t.speaker;
+  const who = t.speaker === "runner" ? "🏃 ランナー" : "🚑 あなた";
+  const tr = (t.speaker === "runner" && showTr && t.ja)
+    ? `<div class="tr">${escapeHTML(t.ja)}</div>` : "";
+  div.innerHTML = `<div class="bubble">
+      <div class="who">${who}</div>
+      <div>${escapeHTML(t.text)}</div>
+      ${tr}
+    </div>`;
+  return div;
+}
+
+function escapeHTML(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+$("nextBtn").addEventListener("click", () => { idx++; render(); });
+$("skipBtn").addEventListener("click", () => { idx++; render(); });
+
+/* =========================================================
+   TTS（お手本）
+   ========================================================= */
+$("playTarget").addEventListener("click", () => {
+  const cur = turns[idx];
+  if (!cur) return;
+  speak(cur.text, lang);
+});
+
+function speak(text, lng) {
+  if (!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lng === "en" ? "en-US" : "zh-CN";
+  u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   音声認識
+   ========================================================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SR) {
+  $("status").textContent = "このブラウザは音声認識に対応していません。Chrome / Edge をお使いください。";
+  $("micBtn").disabled = true;
+}
+
+$("micBtn").addEventListener("click", () => {
+  if (recognizing) { stopRec(); return; }
+  startRec();
+});
+
+async function startRec() {
+  if (!SR) return;
+
+  // 1) MediaRecorder で自分の声をブラウザ内に録音（聞き比べ用、ベストエフォート）
+  try {
+    if (!mediaStream || mediaStream.getTracks().some(t => t.readyState === "ended")) {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+    mediaChunks = [];
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size) mediaChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      if (!mediaChunks.length) return;
+      if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+      const blob = new Blob(mediaChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+      recordedUrl = URL.createObjectURL(blob);
+      $("playMine").disabled = false;
+    };
+    mediaRecorder.start();
+  } catch (e) {
+    // 録音はあくまでオプション。失敗しても音声認識は続行
+    console.warn("録音は使用できません:", e);
+  }
+
+  // 2) 音声認識
+  recognition = new SR();
+  recognition.lang = lang === "en" ? "en-US" : "zh-CN";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = false;
+
+  recognition.onstart = () => {
+    recognizing = true;
+    $("micBtn").classList.add("rec");
+    $("status").textContent = "🎙 録音中… 終わったらマイクをもう一度押してください";
+  };
+  recognition.onerror = (e) => {
+    $("status").textContent = "エラー: " + e.error + "（マイク許可と接続を確認してください）";
+  };
+  recognition.onend = () => {
+    recognizing = false;
+    $("micBtn").classList.remove("rec");
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      try { mediaRecorder.stop(); } catch(_) {}
+    }
+  };
+  recognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    handleTranscript(transcript);
+  };
+
+  try { recognition.start(); }
+  catch (err) { $("status").textContent = "開始に失敗: " + err.message; }
+}
+
+function stopRec() {
+  if (recognition && recognizing) {
+    try { recognition.stop(); } catch(_) {}
+  }
+  // mediaRecorder は recognition.onend で停止
+}
+
+/* 自分の声を再生 */
+$("playMine").addEventListener("click", () => {
+  if (!recordedUrl) return;
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  const a = new Audio(recordedUrl);
+  a.play().catch(err => $("status").textContent = "再生に失敗: " + err.message);
+});
+
+/* ターンが変わったら録音をリセット */
+function resetRecording() {
+  if (recordedUrl) { URL.revokeObjectURL(recordedUrl); recordedUrl = null; }
+  mediaChunks = [];
+  $("playMine").disabled = true;
+}
+
+/* =========================================================
+   スコアリング
+   ========================================================= */
+function handleTranscript(transcript) {
+  const cur = turns[idx];
+  if (!cur || cur.speaker !== "user") return;
+  $("heard").textContent = "認識結果: " + transcript;
+
+  const result = score(cur.text, transcript, lang);
+  const badge = $("scoreBadge");
+  badge.textContent = result.percent + " %";
+  badge.className = "score " + (result.percent >= 80 ? "good" : result.percent >= 55 ? "mid" : "bad");
+
+  $("diff").innerHTML = result.diffHTML;
+  $("nextBtn").disabled = result.percent < 55; // ある程度言えたら次へ進める
+  $("status").textContent =
+    result.percent >= 80 ? "👍 とても良いです！「次へ」で進みましょう。" :
+    result.percent >= 55 ? "もう少しで完璧。もう一度言ってみても、進んでもOKです。" :
+                           "発音が認識されにくかったようです。もう一度試してみましょう。";
+}
+
+/* 採点：英語は単語単位、中国語は文字単位（句読点除去） */
+function score(target, heard, lng) {
+  if (lng === "en") {
+    const t = normalizeEn(target);
+    const h = normalizeEn(heard);
+    const tWords = t.split(/\s+/).filter(Boolean);
+    const hSet = new Set(h.split(/\s+/).filter(Boolean));
+    let matched = 0;
+    const diff = tWords.map(w => {
+      if (hSet.has(w)) { matched++; return `<span class="ok">${escapeHTML(w)}</span>`; }
+      return `<span class="miss">${escapeHTML(w)}</span>`;
+    }).join(" ");
+    const percent = Math.round((matched / Math.max(1, tWords.length)) * 100);
+    return { percent, diffHTML: "差分: " + diff };
+  } else {
+    const t = normalizeZh(target);
+    const h = normalizeZh(heard);
+    const hSet = new Set([...h]);
+    let matched = 0;
+    let diff = "";
+    for (const ch of t) {
+      if (hSet.has(ch)) { matched++; diff += `<span class="ok">${ch}</span>`; }
+      else              { diff += `<span class="miss">${ch}</span>`; }
+    }
+    const percent = Math.round((matched / Math.max(1, [...t].length)) * 100);
+    return { percent, diffHTML: "差分: " + diff };
+  }
+}
+function normalizeEn(s) {
+  return s.toLowerCase().replace(/[.,!?;:"'’“”\-—()]/g, " ").replace(/\s+/g, " ").trim();
+}
+function normalizeZh(s) {
+  return s.replace(/[\s。，！？、；：「」『』（）(),.!?;:"'’“”\-—]/g, "");
+}
+</script>
+</body>
+</html>
