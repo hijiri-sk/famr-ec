@@ -159,6 +159,7 @@
         <div>
           <div class="who">あなたのセリフ（レスキュースタッフ）</div>
           <div id="targetText" class="target"></div>
+          <div id="targetTr" class="tr" style="display:none;"></div>
           <div id="heard" class="heard"></div>
           <div id="diff" class="diff note" style="margin-top:4px;"></div>
         </div>
@@ -194,10 +195,12 @@
    ========================================================= */
 const intro = {
   en: [
-    { speaker: "user",   text: "Hello! Are you okay? I'm with the rescue staff. What happened?" },
+    { speaker: "user", text: "Hi! Are you okay? I'm with the rescue staff. What happened?",
+      ja: "大丈夫ですか？レスキュースタッフです。何があったのですか？" },
   ],
   zh: [
-    { speaker: "user",   text: "你好！你还好吗？我是救援人员。发生了什么事？" },
+    { speaker: "user", text: "你好！你还好吗？我是救援人员。发生了什么事？",
+      ja: "大丈夫ですか？レスキュースタッフです。何があったのですか？" },
   ],
 };
 
@@ -207,36 +210,46 @@ const scripts = {
     en: [
       { speaker: "runner", text: "I twisted my ankle on a rock. It really hurts.",
         ja: "石で足首をひねりました。とても痛いです。" },
-      { speaker: "user",   text: "Please sit down. Can you show me where it hurts?" },
+      { speaker: "user", text: "Oh, can you show me where it hurts?",
+        ja: "ああ、どこが痛むか見せてもらえますか？" },
       { speaker: "runner", text: "Right here, on the outside of my ankle.",
         ja: "ここ、足首の外側です。" },
-      { speaker: "user",   text: "Is it swollen? Can you move your foot a little?" },
-      { speaker: "runner", text: "It's swelling. Moving it hurts a lot.",
-        ja: "腫れています。動かすとすごく痛いです。" },
-      { speaker: "user",   text: "Before I treat it — did you eat and drink at the last aid station?" },
+      { speaker: "user", text: "OK, I will just patch you up.",
+        ja: "わかりました、応急処置をしますね。" },
+      { speaker: "runner", text: "Thank you.",
+        ja: "ありがとう。" },
+      { speaker: "user", text: "Before now — did you eat and drink at the last aid station?",
+        ja: "その前に — 前のエイドで飲食はしましたか？" },
       { speaker: "runner", text: "I had a gel and some water there, about an hour ago.",
         ja: "1時間ほど前、エイドでジェルを食べて水も飲みました。" },
-      { speaker: "user",   text: "Good. I will put a cold pack on it and wrap a bandage." },
-      { speaker: "runner", text: "Thank you. Can I walk down the trail?",
-        ja: "ありがとう。自分で下山できますか？" },
-      { speaker: "user",   text: "Please don't put weight on it. I will call for help to carry you out." },
+      { speaker: "user", text: "Good. Can you walk down by yourself?",
+        ja: "よかったです。自分で下山できそうですか？" },
+      { speaker: "runner", text: "No.",
+        ja: "いいえ。" },
+      { speaker: "user", text: "OK, I will call for help to carry you out. Please wait.",
+        ja: "わかりました、搬送のヘルプを呼びます。少し待ってください。" },
     ],
     zh: [
       { speaker: "runner", text: "我在石头上扭到脚踝了，很疼。",
         ja: "石で足首をひねりました。とても痛いです。" },
-      { speaker: "user",   text: "请坐下来。可以告诉我哪里疼吗？" },
+      { speaker: "user", text: "啊，可以告诉我哪里疼吗？",
+        ja: "ああ、どこが痛むか見せてもらえますか？" },
       { speaker: "runner", text: "就在这里，脚踝的外侧。",
         ja: "ここ、足首の外側です。" },
-      { speaker: "user",   text: "肿起来了吗？可以稍微动一下脚吗？" },
-      { speaker: "runner", text: "肿了，一动就很疼。",
-        ja: "腫れています。動かすとすごく痛いです。" },
-      { speaker: "user",   text: "处理之前问一下——你在上一个补给站有吃东西、喝水吗？" },
+      { speaker: "user", text: "好的，我给你做应急处置。",
+        ja: "わかりました、応急処置をしますね。" },
+      { speaker: "runner", text: "谢谢。",
+        ja: "ありがとう。" },
+      { speaker: "user", text: "在那之前——你在上一个补给站有吃东西、喝水吗？",
+        ja: "その前に — 前のエイドで飲食はしましたか？" },
       { speaker: "runner", text: "大概一个小时前，在补给站吃了能量胶，也喝了水。",
         ja: "1時間ほど前、エイドでジェルを食べて水も飲みました。" },
-      { speaker: "user",   text: "好。我给你敷冰袋，然后用绷带固定。" },
-      { speaker: "runner", text: "谢谢。我还能自己走下山吗？",
-        ja: "ありがとう。自分で下山できますか？" },
-      { speaker: "user",   text: "请不要用力踩。我叫人来把你抬下去。" },
+      { speaker: "user", text: "好。你能自己走下山吗？",
+        ja: "よかったです。自分で下山できそうですか？" },
+      { speaker: "runner", text: "不行。",
+        ja: "いいえ。" },
+      { speaker: "user", text: "好的，我叫人来把你抬下去。请稍等。",
+        ja: "わかりました、搬送のヘルプを呼びます。少し待ってください。" },
     ],
   },
 
@@ -245,36 +258,46 @@ const scripts = {
     en: [
       { speaker: "runner", text: "I fell on a sharp rock. My leg is bleeding.",
         ja: "尖った石の上に転んで、脚から血が出ています。" },
-      { speaker: "user",   text: "Let me see the wound. I will press on it to stop the bleeding." },
+      { speaker: "user", text: "Let me see the wound. I will press on it to stop the bleeding.",
+        ja: "傷を見せてください。圧迫して止血します。" },
       { speaker: "runner", text: "It really hurts. Is the cut deep?",
         ja: "とても痛いです。傷は深いですか？" },
-      { speaker: "user",   text: "Please keep pressing here while I get a bandage." },
+      { speaker: "user", text: "Please keep pressing here while I get a bandage.",
+        ja: "ここを押さえていてください、包帯を取ってきます。" },
       { speaker: "runner", text: "Okay. I feel a little dizzy.",
         ja: "わかりました。少しめまいがします。" },
-      { speaker: "user",   text: "Have you been drinking water today? When did you last eat?" },
+      { speaker: "user", text: "Have you been drinking water today? When did you last eat?",
+        ja: "今日は水を飲んでいますか？最後に食べたのはいつですか？" },
       { speaker: "runner", text: "Not much water. I ate at the aid station about an hour ago.",
         ja: "水はあまり飲んでいません。1時間ほど前にエイドで食べました。" },
-      { speaker: "user",   text: "Lie down and raise your leg. Drink some water slowly." },
+      { speaker: "user", text: "Lie down and raise your leg. Drink some water slowly.",
+        ja: "横になって、脚を高くしてください。水をゆっくり飲んでください。" },
       { speaker: "runner", text: "Thank you. Will I be alright?",
         ja: "ありがとう。大丈夫でしょうか？" },
-      { speaker: "user",   text: "Stay calm. I am calling for an evacuation right now." },
+      { speaker: "user", text: "I will call for help to carry you out. Please wait.",
+        ja: "搬送のヘルプを呼びます。少し待ってください。" },
     ],
     zh: [
       { speaker: "runner", text: "我摔在尖石头上，腿在流血。",
         ja: "尖った石の上に転んで、脚から血が出ています。" },
-      { speaker: "user",   text: "让我看一下伤口。我用手按住止血。" },
+      { speaker: "user", text: "让我看一下伤口。我用手按住止血。",
+        ja: "傷を見せてください。圧迫して止血します。" },
       { speaker: "runner", text: "好疼，伤口很深吗？",
         ja: "とても痛いです。傷は深いですか？" },
-      { speaker: "user",   text: "请你按住这里，我去拿绷带。" },
+      { speaker: "user", text: "请你按住这里，我去拿绷带。",
+        ja: "ここを押さえていてください、包帯を取ってきます。" },
       { speaker: "runner", text: "好。我有点头晕。",
         ja: "わかりました。少しめまいがします。" },
-      { speaker: "user",   text: "你今天有喝水吗？最后一次吃东西是什么时候？" },
+      { speaker: "user", text: "你今天有喝水吗？最后一次吃东西是什么时候？",
+        ja: "今日は水を飲んでいますか？最後に食べたのはいつですか？" },
       { speaker: "runner", text: "水喝得不多。大概一个小时前在补给站吃过东西。",
         ja: "水はあまり飲んでいません。1時間ほど前にエイドで食べました。" },
-      { speaker: "user",   text: "请躺下来，把腿抬高，慢慢喝点水。" },
+      { speaker: "user", text: "请躺下来，把腿抬高，慢慢喝点水。",
+        ja: "横になって、脚を高くしてください。水をゆっくり飲んでください。" },
       { speaker: "runner", text: "谢谢。我会没事吧？",
         ja: "ありがとう。大丈夫でしょうか？" },
-      { speaker: "user",   text: "保持冷静。我现在就联系救援。" },
+      { speaker: "user", text: "我叫人来把你抬下去，请稍等。",
+        ja: "搬送のヘルプを呼びます。少し待ってください。" },
     ],
   },
 
@@ -283,36 +306,46 @@ const scripts = {
     en: [
       { speaker: "runner", text: "I'm freezing. I can't stop shaking.",
         ja: "寒くて震えが止まりません。" },
-      { speaker: "user",   text: "Let's move you out of the wind. Can you walk a few steps?" },
+      { speaker: "user", text: "It's windy here — let's move. Can you walk a few steps? Do you need support?",
+        ja: "ここは風があるので、移動しましょう。数歩歩けますか？サポートが必要ですか？" },
       { speaker: "runner", text: "I'll try. I'm so cold.",
         ja: "やってみます。すごく寒いです。" },
-      { speaker: "user",   text: "Are your clothes wet? We need to change into dry layers." },
-      { speaker: "runner", text: "Yes, my jacket is soaked.",
-        ja: "はい、ジャケットがびしょ濡れです。" },
-      { speaker: "user",   text: "Put on this dry jacket. I'll wrap you in a blanket." },
+      { speaker: "user", text: "Do you have anything to wear over your clothes? A rain jacket would be fine. Or, do you have an emergency blanket?",
+        ja: "上に着るものは持っていますか？レインジャケットでもOKです。または、エマージェンシーブランケットはありますか？" },
+      { speaker: "runner", text: "Yes, I have a rain jacket.",
+        ja: "はい、レインジャケットがあります。" },
+      { speaker: "user", text: "OK, please put it on.",
+        ja: "わかりました、着てください。" },
       { speaker: "runner", text: "Thank you. I feel a little better.",
         ja: "ありがとう。少しよくなりました。" },
-      { speaker: "user",   text: "When did you last eat? Calories will help your body warm up." },
+      { speaker: "user", text: "When did you last eat? Calories will help your body warm up.",
+        ja: "最後に食べたのはいつですか？カロリーが体を温めるのに役立ちます。" },
       { speaker: "runner", text: "Not since the last aid station, about two hours ago.",
         ja: "前のエイドから食べていません。2時間ほど前です。" },
-      { speaker: "user",   text: "Please eat this energy bar slowly and drink this warm water. We are calling for rescue." },
+      { speaker: "user", text: "Please eat this energy bar slowly and drink this warm water. We are calling for rescue.",
+        ja: "このエナジーバーをゆっくり食べて、温かい水を飲んでください。救助を呼んでいます。" },
     ],
     zh: [
       { speaker: "runner", text: "我冷得发抖，停不下来。",
         ja: "寒くて震えが止まりません。" },
-      { speaker: "user",   text: "我们离开风口。可以走几步吗？" },
+      { speaker: "user", text: "这里风大，我们移动一下。可以走几步吗？需要我帮你吗？",
+        ja: "ここは風があるので、移動しましょう。数歩歩けますか？サポートが必要ですか？" },
       { speaker: "runner", text: "我试试看。好冷。",
         ja: "やってみます。すごく寒いです。" },
-      { speaker: "user",   text: "你的衣服湿了吗？我们需要换上干衣服。" },
-      { speaker: "runner", text: "嗯，外套全湿了。",
-        ja: "はい、ジャケットがびしょ濡れです。" },
-      { speaker: "user",   text: "请穿上这件干外套。我用毯子把你裹起来。" },
+      { speaker: "user", text: "你有什么可以穿在外面的吗？雨衣也可以。或者你有应急保温毯吗？",
+        ja: "上に着るものは持っていますか？レインジャケットでもOKです。または、エマージェンシーブランケットはありますか？" },
+      { speaker: "runner", text: "嗯，我有雨衣。",
+        ja: "はい、レインジャケットがあります。" },
+      { speaker: "user", text: "好的，请穿上。",
+        ja: "わかりました、着てください。" },
       { speaker: "runner", text: "谢谢，好一点了。",
         ja: "ありがとう。少しよくなりました。" },
-      { speaker: "user",   text: "你最后一次吃东西是什么时候？补充热量能帮助身体回暖。" },
+      { speaker: "user", text: "你最后一次吃东西是什么时候？补充热量能帮助身体回暖。",
+        ja: "最後に食べたのはいつですか？カロリーが体を温めるのに役立ちます。" },
       { speaker: "runner", text: "上一个补给站之后就没吃了，大概两个小时前。",
         ja: "前のエイドから食べていません。2時間ほど前です。" },
-      { speaker: "user",   text: "请慢慢吃这块能量棒，再喝这杯温水。我们正在联系救援。" },
+      { speaker: "user", text: "请慢慢吃这块能量棒，再喝这杯温水。我们正在联系救援。",
+        ja: "このエナジーバーをゆっくり食べて、温かい水を飲んでください。救助を呼んでいます。" },
     ],
   },
 
@@ -321,36 +354,42 @@ const scripts = {
     en: [
       { speaker: "runner", text: "I feel really dizzy. I think I'm going to pass out.",
         ja: "ひどくめまいがします。倒れそうです。" },
-      { speaker: "user",   text: "Let's get you into the shade. Please sit down here." },
+      { speaker: "user", text: "Let's get you into the shade. Please sit down here.",
+        ja: "日陰に移動しましょう。ここに座ってください。" },
       { speaker: "runner", text: "Everything is spinning. My head is pounding.",
         ja: "目が回ります。頭がガンガンします。" },
-      { speaker: "user",   text: "When did you last drink water? Did you eat at the last aid station?" },
+      { speaker: "user", text: "When did you last drink water? Did you eat at the last aid station?",
+        ja: "最後に水を飲んだのはいつですか？前のエイドで食べましたか？" },
       { speaker: "runner", text: "I drank a little about thirty minutes ago. I didn't eat — I felt nauseous.",
         ja: "30分ほど前に少し飲みました。吐き気がして食べていません。" },
-      { speaker: "user",   text: "You may be dehydrated. Please sip this sports drink slowly." },
-      { speaker: "runner", text: "My skin feels hot, but I'm not sweating much anymore.",
-        ja: "肌が熱いですが、もうあまり汗が出ません。" },
-      { speaker: "user",   text: "That is a warning sign. I will pour cool water on your neck and arms." },
+      { speaker: "user", text: "You may be dehydrated. Please sip this slowly.",
+        ja: "脱水しているかもしれません。これをゆっくり飲んでください。" },
+      { speaker: "user", text: "Your skin feels hot, but you're not sweating much anymore. That is a warning sign. I will pour cool water on your neck and arms.",
+        ja: "肌が熱いのに、もうあまり汗をかいていませんね。これは危険な兆候です。首と腕に冷たい水をかけます。" },
       { speaker: "runner", text: "Thank you. I feel a little better now.",
         ja: "ありがとう。今は少しよくなりました。" },
-      { speaker: "user",   text: "Keep taking small sips. If you don't improve in fifteen minutes, we will call for evacuation." },
+      { speaker: "user", text: "Keep taking small sips. If you don't improve in fifteen minutes, we will call for evacuation.",
+        ja: "少しずつ飲み続けてください。15分以内に良くならなければ、救助を呼びます。" },
     ],
     zh: [
       { speaker: "runner", text: "我头好晕，好像快要昏倒了。",
         ja: "ひどくめまいがします。倒れそうです。" },
-      { speaker: "user",   text: "我们到阴凉的地方去。请在这里坐下。" },
+      { speaker: "user", text: "我们到阴凉的地方去。请在这里坐下。",
+        ja: "日陰に移動しましょう。ここに座ってください。" },
       { speaker: "runner", text: "天旋地转，头很痛。",
         ja: "目が回ります。頭がガンガンします。" },
-      { speaker: "user",   text: "你最后一次喝水是什么时候？在上一个补给站有吃东西吗？" },
+      { speaker: "user", text: "你最后一次喝水是什么时候？在上一个补给站有吃东西吗？",
+        ja: "最後に水を飲んだのはいつですか？前のエイドで食べましたか？" },
       { speaker: "runner", text: "大概三十分钟前喝了一点。没吃东西，有点想吐。",
         ja: "30分ほど前に少し飲みました。吐き気がして食べていません。" },
-      { speaker: "user",   text: "你可能脱水了。请慢慢喝这瓶运动饮料。" },
-      { speaker: "runner", text: "皮肤很烫，但已经不太出汗了。",
-        ja: "肌が熱いですが、もうあまり汗が出ません。" },
-      { speaker: "user",   text: "这是危险信号。我用凉水帮你浇脖子和手臂。" },
+      { speaker: "user", text: "你可能脱水了。请慢慢喝。",
+        ja: "脱水しているかもしれません。これをゆっくり飲んでください。" },
+      { speaker: "user", text: "你的皮肤很烫，但已经不太出汗了。这是危险信号。我用凉水帮你浇脖子和手臂。",
+        ja: "肌が熱いのに、もうあまり汗をかいていませんね。これは危険な兆候です。首と腕に冷たい水をかけます。" },
       { speaker: "runner", text: "谢谢，现在好一点了。",
         ja: "ありがとう。今は少しよくなりました。" },
-      { speaker: "user",   text: "请继续小口喝水。十五分钟内没有好转，我们就联系救援。" },
+      { speaker: "user", text: "请继续小口喝水。十五分钟内没有好转，我们就联系救援。",
+        ja: "少しずつ飲み続けてください。15分以内に良くならなければ、救助を呼びます。" },
     ],
   },
 };
@@ -431,6 +470,7 @@ function render() {
     convo.innerHTML += `<div class="card" style="margin:0;text-align:center;">
       ✅ シナリオ完了！お疲れさまでした。</div>`;
     $("targetText").textContent = "";
+    $("targetTr").style.display = "none";
     $("heard").textContent = "";
     $("diff").innerHTML = "";
     $("scoreBadge").textContent = "—";
@@ -449,6 +489,7 @@ function render() {
     convo.appendChild(renderBubble(cur));
 
     $("targetText").textContent = "（ランナーの発話を聞いてください）";
+    $("targetTr").style.display = "none";
     $("heard").textContent = "";
     $("diff").innerHTML = "";
     $("scoreBadge").textContent = "—";
@@ -464,6 +505,13 @@ function render() {
   } else {
     // 自分のターン
     $("targetText").textContent = cur.text;
+    const trEl = $("targetTr");
+    if (showTr && cur.ja) {
+      trEl.textContent = cur.ja;
+      trEl.style.display = "block";
+    } else {
+      trEl.style.display = "none";
+    }
     $("heard").textContent = "";
     $("diff").innerHTML = "";
     $("scoreBadge").textContent = "— %";
@@ -481,7 +529,7 @@ function renderBubble(t) {
   const div = document.createElement("div");
   div.className = "turn " + t.speaker;
   const who = t.speaker === "runner" ? "🏃 ランナー" : "🚑 あなた";
-  const tr = (t.speaker === "runner" && showTr && t.ja)
+  const tr = (showTr && t.ja)
     ? `<div class="tr">${escapeHTML(t.ja)}</div>` : "";
   div.innerHTML = `<div class="bubble">
       <div class="who">${who}</div>
