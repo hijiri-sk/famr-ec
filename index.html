@@ -153,6 +153,31 @@
       </button>
     </div>
 
+    <h3 style="margin:16px 0 8px;font-size:0.95rem;">デモ説明（パンフレット案内）</h3>
+    <p class="note" style="margin:0 0 8px;">参加者にFAMRの5つのお願いを説明する練習。あなた=説明者、相手=参加者。</p>
+    <div class="scenarios">
+      <button class="scen" data-scen="briefing_location">
+        <h3>⑥ デモ①：位置情報</h3>
+        <p>Location · 位置信息</p>
+      </button>
+      <button class="scen" data-scen="briefing_airway">
+        <h3>⑦ デモ②：気道確保</h3>
+        <p>Airway · 气道确保</p>
+      </button>
+      <button class="scen" data-scen="briefing_warmth">
+        <h3>⑧ デモ③：保温</h3>
+        <p>Warmth · 保温</p>
+      </button>
+      <button class="scen" data-scen="briefing_bleeding">
+        <h3>⑨ デモ④：止血</h3>
+        <p>Bleeding · 止血</p>
+      </button>
+      <button class="scen" data-scen="briefing_immobilize">
+        <h3>⑩ デモ⑤：固定</h3>
+        <p>Immobilization · 固定</p>
+      </button>
+    </div>
+
     <h3 style="margin:16px 0 8px;font-size:0.95rem;">練習モード</h3>
     <div class="scenarios">
       <button class="scen" data-mode="random">
@@ -471,6 +496,218 @@ const scripts = {
         ja: "わかりました。本当にありがとうございます。" },
     ],
   },
+
+  /* === デモ説明シナリオ群（パンフレット案内） ===
+     相手＝デモ参加者。partnerLabel と skipIntro で挙動を切り替える。 */
+  briefing_location: {
+    title_ja: "デモ①：位置情報",
+    partnerLabel: "👥 参加者",
+    skipIntro: true,
+    en: [
+      { speaker: "user", text: "Hello everyone. Today I'll introduce FAMR — five things we ask you to do if you find an injured runner. The first and most important is your location.",
+        ja: "こんにちは。今日はFAMR — トレイルでケガ人を見つけた時にお願いしたい5つを紹介します。最初で一番大事なのは『位置情報』です。" },
+      { speaker: "runner", text: "Why is location so important?",
+        ja: "位置情報って、なぜそんなに大事なんですか？" },
+      { speaker: "user", text: "Trails have no street addresses. Without exact latitude and longitude, rescue teams cannot find you.",
+        ja: "トレイルには番地がありません。正確な緯度経度を伝えないと、救助隊が来られないからです。" },
+      { speaker: "runner", text: "How do I find my coordinates?",
+        ja: "緯度経度はどうやって調べるんですか？" },
+      { speaker: "user", text: "Use a GPS app like Geographica, or scan our \"Ichi-okuru-kun\" QR code to send your location.",
+        ja: "GPSアプリ — 例えば Geographica — か、私たちの『いちおくるクン』のQRコードで簡単に取れます。" },
+      { speaker: "runner", text: "What if there's no signal?",
+        ja: "電波がない場所だったら？" },
+      { speaker: "user", text: "Walk to where there's signal, or ask another runner to relay the message. The coordinates themselves are what matter.",
+        ja: "電波が届く場所まで移動するか、他のランナーに頼んで伝えてもらってください。座標があれば伝言で十分です。" },
+      { speaker: "user", text: "One more thing: there are two formats — degrees-minutes-seconds and decimal degrees. The numbers look different but mean the same place. Be careful when reading them out.",
+        ja: "もう一つ。緯度経度には2つの書き方があります。度分秒と10進数。同じ場所でも数値が違うので、読み上げる時は注意してください。" },
+    ],
+    zh: [
+      { speaker: "user", text: "大家好。今天我来介绍FAMR — 在山里发现受伤的人时，希望大家做的五件事。第一项也是最重要的，是位置信息。",
+        ja: "こんにちは。今日はFAMR — トレイルでケガ人を見つけた時にお願いしたい5つを紹介します。最初で一番大事なのは『位置情報』です。" },
+      { speaker: "runner", text: "为什么位置这么重要？",
+        ja: "位置情報って、なぜそんなに大事なんですか？" },
+      { speaker: "user", text: "山道没有门牌号。没有准确的经纬度，救援队就找不到你们。",
+        ja: "トレイルには番地がありません。正確な緯度経度を伝えないと、救助隊が来られないからです。" },
+      { speaker: "runner", text: "怎么知道自己的经纬度？",
+        ja: "緯度経度はどうやって調べるんですか？" },
+      { speaker: "user", text: "用GPS应用，比如Geographica，或者扫我们的\"Ichi-okuru-kun\"二维码，就可以发送位置。",
+        ja: "GPSアプリ — 例えば Geographica — か、私たちの『いちおくるクン』のQRコードで簡単に取れます。" },
+      { speaker: "runner", text: "如果没有信号怎么办？",
+        ja: "電波がない場所だったら？" },
+      { speaker: "user", text: "走到有信号的地方，或者让别的跑者帮忙传话。重要的是坐标本身。",
+        ja: "電波が届く場所まで移動するか、他のランナーに頼んで伝えてもらってください。座標があれば伝言で十分です。" },
+      { speaker: "user", text: "还有一点：经纬度有两种写法，度分秒和十进制。同一个地点，数字不一样，念的时候请注意区分。",
+        ja: "もう一つ。緯度経度には2つの書き方があります。度分秒と10進数。同じ場所でも数値が違うので、読み上げる時は注意してください。" },
+    ],
+  },
+
+  briefing_airway: {
+    title_ja: "デモ②：気道確保",
+    partnerLabel: "👥 参加者",
+    skipIntro: true,
+    en: [
+      { speaker: "user", text: "Next is securing the airway. If you find someone unconscious, the first thing is to keep their airway open.",
+        ja: "次は気道確保です。意識のない人を見つけたら、まず気道を確保してください。" },
+      { speaker: "runner", text: "How do we do that exactly?",
+        ja: "気道確保って、具体的に何をするんですか？" },
+      { speaker: "user", text: "Place them on their side — the recovery position. This stops the tongue from blocking the airway.",
+        ja: "横向きに寝かせる『回復体位』を取らせます。これで舌の落ち込みを防げます。" },
+      { speaker: "runner", text: "Why not on their back?",
+        ja: "なぜ仰向けじゃダメなんですか？" },
+      { speaker: "user", text: "When the person is unconscious, the base of the tongue falls back and blocks the airway. That can cause suffocation.",
+        ja: "意識がないと舌の根が下に落ちて、気道をふさいでしまうからです。窒息の原因になります。" },
+      { speaker: "runner", text: "What if they vomit?",
+        ja: "嘔吐したらどうしますか？" },
+      { speaker: "user", text: "On their side, vomit drains out naturally. On their back, it can choke them.",
+        ja: "横向きなら吐いたものが自然に外に出ます。仰向けだと喉に詰まります。" },
+      { speaker: "user", text: "Just keep them on their side and watch them until rescue arrives. This single action can save a life.",
+        ja: "救助隊が来るまで、横向きにして見守ってください。これだけで命が助かります。" },
+    ],
+    zh: [
+      { speaker: "user", text: "第二项是气道确保。如果发现昏迷的人，首先要保持他的气道通畅。",
+        ja: "次は気道確保です。意識のない人を見つけたら、まず気道を確保してください。" },
+      { speaker: "runner", text: "具体怎么做呢？",
+        ja: "気道確保って、具体的に何をするんですか？" },
+      { speaker: "user", text: "让他侧卧，叫做\"恢复体位\"。这样可以防止舌头堵住气道。",
+        ja: "横向きに寝かせる『回復体位』を取らせます。これで舌の落ち込みを防げます。" },
+      { speaker: "runner", text: "为什么不能仰卧？",
+        ja: "なぜ仰向けじゃダメなんですか？" },
+      { speaker: "user", text: "昏迷的时候，舌根会往下掉，堵住气道，造成窒息。",
+        ja: "意識がないと舌の根が下に落ちて、気道をふさいでしまうからです。窒息の原因になります。" },
+      { speaker: "runner", text: "如果他呕吐了怎么办？",
+        ja: "嘔吐したらどうしますか？" },
+      { speaker: "user", text: "侧卧的话，呕吐物会自然流出来。仰卧的话，可能会噎住。",
+        ja: "横向きなら吐いたものが自然に外に出ます。仰向けだと喉に詰まります。" },
+      { speaker: "user", text: "保持侧卧姿势，看护他直到救援到达。这一点就能救命。",
+        ja: "救助隊が来るまで、横向きにして見守ってください。これだけで命が助かります。" },
+    ],
+  },
+
+  briefing_warmth: {
+    title_ja: "デモ③：保温",
+    partnerLabel: "👥 参加者",
+    skipIntro: true,
+    en: [
+      { speaker: "user", text: "Third is keeping the person warm. Hypothermia is a major risk in the mountains.",
+        ja: "3つ目は保温です。山では低体温症が大きなリスクです。" },
+      { speaker: "runner", text: "Hypothermia even in summer?",
+        ja: "夏でも低体温症になるんですか？" },
+      { speaker: "user", text: "Yes. If sweat-soaked clothes meet wind, body temperature drops fast — even in summer.",
+        ja: "なります。汗で濡れて風に当たると、夏でも体温が急激に下がります。" },
+      { speaker: "runner", text: "How do we keep them warm?",
+        ja: "どうやって保温するんですか？" },
+      { speaker: "user", text: "Four things: insulate from the ground, cover exposed skin, change wet clothes, and move them into sunlight.",
+        ja: "ポイントは4つ。地面から離す、肌の露出を減らす、濡れた服を替える、日当たりへ移す、です。" },
+      { speaker: "runner", text: "What can we use from our gear?",
+        ja: "持っているもので何が使えますか？" },
+      { speaker: "user", text: "A backpack, rain jacket, emergency shelter, blanket — anything. The most important thing is not letting them lie on bare ground.",
+        ja: "ザック、レインウェア、ツェルト、毛布。何でも使ってください。地面に直接寝かせないことが一番大事です。" },
+      { speaker: "user", text: "Remember the four ways heat is lost: conduction, convection, evaporation, and radiation. Block all four paths.",
+        ja: "覚え方は『伝導・対流・蒸発・放射』。この4つの熱の逃げ道をふさぐと考えてください。" },
+    ],
+    zh: [
+      { speaker: "user", text: "第三项是保温。在山里，低体温症是很大的风险。",
+        ja: "3つ目は保温です。山では低体温症が大きなリスクです。" },
+      { speaker: "runner", text: "夏天也会失温吗？",
+        ja: "夏でも低体温症になるんですか？" },
+      { speaker: "user", text: "会。被汗水浸湿后再吹风，夏天体温也会迅速下降。",
+        ja: "なります。汗で濡れて風に当たると、夏でも体温が急激に下がります。" },
+      { speaker: "runner", text: "怎么给伤员保温？",
+        ja: "どうやって保温するんですか？" },
+      { speaker: "user", text: "四个要点：与地面隔开，减少皮肤暴露，换掉湿衣服，移到阳光下。",
+        ja: "ポイントは4つ。地面から離す、肌の露出を減らす、濡れた服を替える、日当たりへ移す、です。" },
+      { speaker: "runner", text: "可以用身上的什么东西？",
+        ja: "持っているもので何が使えますか？" },
+      { speaker: "user", text: "背包、雨衣、紧急避难帐、毛毯，都可以。最重要的是不能让他直接躺在地上。",
+        ja: "ザック、レインウェア、ツェルト、毛布。何でも使ってください。地面に直接寝かせないことが一番大事です。" },
+      { speaker: "user", text: "记住四种热损失：传导、对流、蒸发、辐射。把这四条路都堵住。",
+        ja: "覚え方は『伝導・対流・蒸発・放射』。この4つの熱の逃げ道をふさぐと考えてください。" },
+    ],
+  },
+
+  briefing_bleeding: {
+    title_ja: "デモ④：止血",
+    partnerLabel: "👥 参加者",
+    skipIntro: true,
+    en: [
+      { speaker: "user", text: "Fourth is stopping bleeding. The basic technique is direct pressure.",
+        ja: "4つ目は止血です。直接圧迫止血法といいます。" },
+      { speaker: "runner", text: "Is it safe to touch the blood directly?",
+        ja: "血に直接触っても大丈夫ですか？" },
+      { speaker: "user", text: "No. Always wear gloves or use plastic bags to prevent infection.",
+        ja: "ダメです。感染防止のため、必ずビニール手袋などを使ってください。" },
+      { speaker: "runner", text: "Where exactly do I press?",
+        ja: "どこを押さえればいいですか？" },
+      { speaker: "user", text: "Press firmly on the wound itself with clean gauze or a towel. Push down toward the bone underneath.",
+        ja: "出血している場所を、清潔なガーゼやタオルで強く直接押さえます。骨に向かって押さえる感じです。" },
+      { speaker: "runner", text: "For how long?",
+        ja: "どれくらいの時間ですか？" },
+      { speaker: "user", text: "Press continuously for about twenty minutes. Don't release in the middle.",
+        ja: "20分ほど押さえ続けてください。途中で離さないことが大事です。" },
+      { speaker: "user", text: "If it still bleeds after twenty minutes, you're probably off the spot, or not pressing hard enough.",
+        ja: "20分経っても止まらない場合は、押さえる場所がずれているか、力が弱いことが多いです。" },
+    ],
+    zh: [
+      { speaker: "user", text: "第四项是止血。我们叫直接压迫止血法。",
+        ja: "4つ目は止血です。直接圧迫止血法といいます。" },
+      { speaker: "runner", text: "可以直接接触血液吗？",
+        ja: "血に直接触っても大丈夫ですか？" },
+      { speaker: "user", text: "不行。为了防止感染，请一定戴手套或用塑料袋。",
+        ja: "ダメです。感染防止のため、必ずビニール手袋などを使ってください。" },
+      { speaker: "runner", text: "应该按哪里？",
+        ja: "どこを押さえればいいですか？" },
+      { speaker: "user", text: "用干净的纱布或毛巾，直接按在出血的伤口上。要朝骨头的方向压。",
+        ja: "出血している場所を、清潔なガーゼやタオルで強く直接押さえます。骨に向かって押さえる感じです。" },
+      { speaker: "runner", text: "要按多久？",
+        ja: "どれくらいの時間ですか？" },
+      { speaker: "user", text: "持续按二十分钟左右。中途不要松开。",
+        ja: "20分ほど押さえ続けてください。途中で離さないことが大事です。" },
+      { speaker: "user", text: "如果二十分钟还止不住，多半是按错了位置，或者力气不够。",
+        ja: "20分経っても止まらない場合は、押さえる場所がずれているか、力が弱いことが多いです。" },
+    ],
+  },
+
+  briefing_immobilize: {
+    title_ja: "デモ⑤：固定",
+    partnerLabel: "👥 参加者",
+    skipIntro: true,
+    en: [
+      { speaker: "user", text: "The last point is immobilization, for suspected fractures.",
+        ja: "最後は固定です。骨折の疑いがあるときの対応です。" },
+      { speaker: "runner", text: "Can we move them?",
+        ja: "動かしてもいいんですか？" },
+      { speaker: "user", text: "Don't move the injury unnecessarily. Let them rest in the position that hurts the least.",
+        ja: "むやみに動かさないでください。本人が一番楽な姿勢で安静にします。" },
+      { speaker: "runner", text: "What can we use as a splint?",
+        ja: "副木は何を使えばいいですか？" },
+      { speaker: "user", text: "Anything rigid will do — trekking poles, branches, a SAM splint. Whatever you have on hand.",
+        ja: "まっすぐ固定できれば何でも構いません。トレッキングポール、木の枝、サムスプリントなど。" },
+      { speaker: "runner", text: "How much area do we need to immobilize?",
+        ja: "どこからどこまで固定するんですか？" },
+      { speaker: "user", text: "Include the two joints — the one above and the one below the fracture. For a forearm, that means both the elbow and the wrist.",
+        ja: "骨折部位の上下、2つの関節を含めて固定します。例えば前腕なら、肘と手首の両方です。" },
+      { speaker: "user", text: "If there is also bleeding, stop the bleeding first. Splinting comes after. That covers all five points. Any questions?",
+        ja: "出血があれば止血を優先してください。固定は止血のあとです。以上が5つのお願いです。質問はありますか？" },
+    ],
+    zh: [
+      { speaker: "user", text: "最后是固定，针对疑似骨折的情况。",
+        ja: "最後は固定です。骨折の疑いがあるときの対応です。" },
+      { speaker: "runner", text: "可以动他吗？",
+        ja: "動かしてもいいんですか？" },
+      { speaker: "user", text: "不要随便移动伤处。让他保持最不疼的姿势安静休息。",
+        ja: "むやみに動かさないでください。本人が一番楽な姿勢で安静にします。" },
+      { speaker: "runner", text: "用什么做夹板？",
+        ja: "副木は何を使えばいいですか？" },
+      { speaker: "user", text: "只要能直直地固定住就行 — 登山杖、树枝、SAM夹板都可以。",
+        ja: "まっすぐ固定できれば何でも構いません。トレッキングポール、木の枝、サムスプリントなど。" },
+      { speaker: "runner", text: "需要固定到哪里？",
+        ja: "どこからどこまで固定するんですか？" },
+      { speaker: "user", text: "包括骨折处上下两个关节。比如前臂，就要同时固定肘和手腕。",
+        ja: "骨折部位の上下、2つの関節を含めて固定します。例えば前腕なら、肘と手首の両方です。" },
+      { speaker: "user", text: "如果还有出血，请先止血，然后再做固定。以上就是五个要点。有问题吗？",
+        ja: "出血があれば止血を優先してください。固定は止血のあとです。以上が5つのお願いです。質問はありますか？" },
+    ],
+  },
 };
 
 /* =========================================================
@@ -748,10 +985,12 @@ function render() {
   const cur = turns[idx];
 
   if (cur.speaker === "runner") {
-    // ランナーのセリフはこちらで読み上げ、Nextボタンで進む
+    // 相手（ランナー or 参加者）のセリフはこちらで読み上げ、Nextボタンで進む
     convo.appendChild(renderBubble(cur));
 
-    $("targetText").textContent = "（ランナーの発話を聞いてください）";
+    // 「🏃 ランナー」「👥 参加者」から先頭の絵文字+空白を除いた短い名前を作る
+    const partner = getPartnerLabel(cur._scen).replace(/^\S+\s*/, "");
+    $("targetText").textContent = `（${partner}の発話を聞いてください）`;
     $("targetTr").style.display = "none";
     $("heard").textContent = "";
     $("diff").innerHTML = "";
@@ -787,11 +1026,16 @@ function render() {
   }
 }
 
+/* シナリオ毎の「相手」ラベル（デモ説明では『参加者』に切替） */
+function getPartnerLabel(scenName) {
+  return (scripts[scenName] && scripts[scenName].partnerLabel) || "🏃 ランナー";
+}
+
 /* 吹き出し1つを生成（runner は和訳を任意表示） */
 function renderBubble(t) {
   const div = document.createElement("div");
   div.className = "turn " + t.speaker;
-  const who = t.speaker === "runner" ? "🏃 ランナー" : "🚑 あなた";
+  const who = t.speaker === "runner" ? getPartnerLabel(t._scen) : "🚑 あなた";
   const tr = (showTr && t.ja)
     ? `<div class="tr">${escapeHTML(t.ja)}</div>` : "";
   div.innerHTML = `<div class="bubble">
