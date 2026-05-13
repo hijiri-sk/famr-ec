@@ -721,6 +721,9 @@ let turns = [];         // 結合済みターン配列
 let idx = 0;
 let recognition = null;
 let recognizing = false;
+// 継続認識用 — マイクを再度押すまで採点に入らないために蓄積する
+let finalTranscript = "";    // 確定済みテキストを連結して保持
+let userRequestedStop = false; // true なら onend で採点へ／false ならブラウザの自動終了とみなして自動再開
 // 自分の声の録音（聞き比べ用）
 let mediaStream = null;
 let mediaRecorder = null;
@@ -1159,31 +1162,74 @@ async function startRec() {
     console.warn("録音は使用できません:", e);
   }
 
-  // 2) 音声認識
+  // 2) 音声認識（継続モード）
+  // マイクを再度押すまで自動で採点に入らない／途中の沈黙で打ち切られないようにする
+  finalTranscript = "";
+  userRequestedStop = false;
+
   recognition = new SR();
   recognition.lang = lang === "en" ? "en-US" : "zh-CN";
-  recognition.interimResults = false;
+  recognition.interimResults = true;   // 途中経過を「認識中:」に出して安心感を出す
   recognition.maxAlternatives = 1;
-  recognition.continuous = false;
+  recognition.continuous = true;        // 沈黙では止めない（ユーザー操作で止める）
 
   recognition.onstart = () => {
     recognizing = true;
     $("micBtn").classList.add("rec");
-    $("status").textContent = "🎙 録音中… 終わったらマイクをもう一度押してください";
+    $("status").textContent = "🎙 録音中… 言い終わったらマイクをもう一度押してください（途中で間が空いても止まりません）";
   };
   recognition.onerror = (e) => {
-    $("status").textContent = "エラー: " + e.error + "（マイク許可と接続を確認してください）";
+    // not-allowed / service-not-allowed は致命的 → 自動再開させない
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+      userRequestedStop = true;
+      $("status").textContent = "エラー: " + e.error + "（マイク許可と接続を確認してください）";
+    } else {
+      // no-speech / aborted / network などは onend で自動再開に任せる
+      console.warn("recognition error:", e.error);
+    }
   };
   recognition.onend = () => {
-    recognizing = false;
-    $("micBtn").classList.remove("rec");
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      try { mediaRecorder.stop(); } catch(_) {}
+    // ユーザーが明示的に止めた場合のみ採点へ
+    if (userRequestedStop) {
+      recognizing = false;
+      $("micBtn").classList.remove("rec");
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        try { mediaRecorder.stop(); } catch(_) {}
+      }
+      const cleaned = finalTranscript.trim();
+      if (cleaned) handleTranscript(cleaned);
+      else $("status").textContent = "音声を認識できませんでした。もう一度試してください。";
+      return;
+    }
+    // ブラウザが勝手に止めた（長い沈黙等）→ 自動再開して聴き続ける
+    try { recognition.start(); }
+    catch (_) {
+      // 直後の start() は InvalidStateError を出すことがあるので少し待ってリトライ
+      setTimeout(() => {
+        if (userRequestedStop) return;
+        try { recognition.start(); }
+        catch (err) {
+          recognizing = false;
+          $("micBtn").classList.remove("rec");
+          $("status").textContent = "録音を再開できませんでした。マイクをもう一度押してください。";
+        }
+      }, 150);
     }
   };
   recognition.onresult = (e) => {
-    const transcript = e.results[0][0].transcript;
-    handleTranscript(transcript);
+    // 継続モードでは e.results に過去分も含まれるため、resultIndex 以降だけ処理する
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      if (res.isFinal) {
+        finalTranscript += (finalTranscript ? " " : "") + res[0].transcript;
+      } else {
+        interim += res[0].transcript;
+      }
+    }
+    // 採点はせず、ライブで認識中の様子だけ見せる
+    const live = (finalTranscript + " " + interim).trim();
+    if (live) $("heard").textContent = "認識中: " + live;
   };
 
   try { recognition.start(); }
@@ -1192,6 +1238,7 @@ async function startRec() {
 
 function stopRec() {
   if (recognition && recognizing) {
+    userRequestedStop = true;          // onend に「ユーザー操作で止めた」と伝える → 採点へ進む
     try { recognition.stop(); } catch(_) {}
   }
   // mediaRecorder は recognition.onend で停止
