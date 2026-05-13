@@ -828,12 +828,52 @@ $("playTarget").addEventListener("click", () => {
   speak(cur.text, lang);
 });
 
+/* TTS用voiceキャッシュ。iOS Safariは getVoices() が初回空なので
+   voiceschanged を待ってキャッシュする。 */
+let _voicesCache = [];
+function _loadVoices() {
+  if (!("speechSynthesis" in window)) return;
+  _voicesCache = window.speechSynthesis.getVoices() || [];
+}
+_loadVoices();
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = _loadVoices;
+}
+
+/* lng ("en" | "zh") に最適な voice を選ぶ。見つからなければ null を返す。 */
+function pickVoice(lng) {
+  if (!_voicesCache.length) _loadVoices();
+  const vs = _voicesCache;
+  if (lng === "en") {
+    return vs.find(v => /^en[-_]US/i.test(v.lang))
+        || vs.find(v => /^en/i.test(v.lang))
+        || null;
+  }
+  // 中国語：zh-CN（簡体）優先 → zh-Hans → 任意のzh
+  return vs.find(v => /^zh[-_]CN/i.test(v.lang))
+      || vs.find(v => /zh[-_]?Hans/i.test(v.lang))
+      || vs.find(v => /^zh[-_]SG/i.test(v.lang))
+      || vs.find(v => /^zh/i.test(v.lang))
+      || null;
+}
+
 function speak(text, lng) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = lng === "en" ? "en-US" : "zh-CN";
   u.rate = 0.95;
+
+  const v = pickVoice(lng);
+  if (v) {
+    u.voice = v;
+    u.lang = v.lang; // voiceに合わせる（iOS Safariで重要）
+  } else if (lng === "zh") {
+    // 中国語voiceが端末に無い → 日本語voiceで読まれて発音崩壊するので警告
+    const st = $("status");
+    if (st) st.textContent = "この端末に中国語の音声が入っていません。iOS：設定 → アクセシビリティ → 読み上げコンテンツ → 声 → 中国語(中国本土) から音声をダウンロードしてください。";
+    return;
+  }
   window.speechSynthesis.speak(u);
 }
 
